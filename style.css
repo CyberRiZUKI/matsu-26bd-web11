@@ -534,3 +534,177 @@ table.jt tr:hover td { background: color-mix(in srgb, var(--yellow) 25%, var(--b
 
 .chat .time { flex: 0 0 auto; font-size: 11px; opacity: .6; padding-bottom: 2px; }
 
+
+/* =========================================================
+   JOURNAL PAGE: PIXEL TV (scoped to .tv)
+   ========================================================= */
+.tv {
+    --tv-body: var(--pink, #ffc8dd);
+    --tv-line: var(--text, #3b2f3a);
+    --tv-glass: #1b1620;
+    position: relative;
+    margin: 28px auto 36px;
+    max-width: 100%;
+}
+
+/* body: the 4 offset shadows make a pixel border with notched corners */
+.tv-body {
+    position: relative;
+    padding: 16px 16px 12px;
+    background: var(--tv-body);
+    box-shadow:
+            0 -4px 0 0 var(--tv-line),
+            0  4px 0 0 var(--tv-line),
+            -4px 0 0 0 var(--tv-line),
+            4px 0 0 0 var(--tv-line),
+            10px 14px 0 0 var(--shadow, rgba(0, 0, 0, .18));
+}
+
+/* screen */
+.tv-screen {
+    position: relative;
+    overflow: hidden;
+    min-height: 180px;
+    background: var(--tv-glass);
+    box-shadow:
+            0 -1px 0 0 var(--tv-glass),
+            0  1px 0 0 var(--tv-glass),
+            -1px 0 0 0 var(--tv-glass),
+            1px 0 0 0 var(--tv-glass);
+}
+
+.tv-hint {                                       /* shown while the TV is off */
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--green, #7be0a0);
+    font-size: 13px;
+    letter-spacing: 3px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s .5s;
+}
+.tv.off .tv-hint { opacity: 1; }
+
+.tv-content {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+    padding: 14px 14px 4px;
+    animation: tvOn 1.4s .3s steps(6, end) backwards;
+}
+.tv-content > .box { margin: 0 0 14px; }
+
+.tv-flash {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+    animation: tvFlash 1.4s .3s steps(6, end);
+}
+
+/* control panel under the screen */
+.tv-panel {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 24px;
+}
+.tv-led {
+    width: 12px; height: 12px;
+    background: var(--green, #7be0a0);
+    box-shadow: 0 0 0 3px var(--tv-line);
+}
+.tv.off .tv-led { background: #8a7f88; }
+.tv-grille {
+    flex: 1;
+    height: 16px;
+    background: repeating-linear-gradient(90deg,
+    var(--tv-line) 0 4px, transparent 4px 10px);
+    opacity: .55;
+}
+
+.tv-power {
+    width: 38px; height: 22px;
+    padding: 0;
+    border: 0;
+    background: var(--yellow, #ffd93d);
+    color: var(--tv-line);
+    font: inherit;
+    font-size: 10px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow:
+            0 -3px 0 0 var(--tv-line),
+            0  3px 0 0 var(--tv-line),
+            -3px 0 0 0 var(--tv-line),
+            3px 0 0 0 var(--tv-line);
+}
+.tv-power:hover  { filter: brightness(1.08); }
+.tv-power:active { transform: translateY(2px); }
+.tv-power:focus-visible { outline: 3px dashed var(--tv-line); outline-offset: 6px; }
+
+/* legs */
+.tv-legs { display: flex; justify-content: space-between; padding: 0 14%; margin-top: 4px; }
+.tv-legs i { width: 28px; height: 14px; background: var(--tv-line); }
+
+/* off state (power button) */
+.tv.off .tv-content { animation: tvOff .5s steps(5, end) forwards; pointer-events: none; }
+.tv.off .tv-flash   { animation: none; }
+
+/* the "open the TV" sequence */
+@keyframes tvOn {
+    0%   { clip-path: inset(calc(50% - 2px) calc(50% - 2px)); filter: brightness(10); }
+    25%  { clip-path: inset(calc(50% - 2px) 0);               filter: brightness(10); }
+    60%  { clip-path: inset(0);                               filter: brightness(3); }
+    100% { clip-path: inset(0);                               filter: brightness(1); }
+}
+@keyframes tvOff {
+    0%   { clip-path: inset(0);                               filter: brightness(1);  opacity: 1; }
+    40%  { clip-path: inset(calc(50% - 2px) 0);               filter: brightness(6);  opacity: 1; }
+    100% { clip-path: inset(calc(50% - 2px) calc(50% - 2px)); filter: brightness(10); opacity: 0; }
+}
+@keyframes tvFlash {
+    0%, 40% { opacity: 0; }
+    55%     { opacity: .55; }
+    100%    { opacity: 0; }
+}
+
+@media (max-width: 560px) {
+    .tv-body    { padding: 18px 14px 12px; }
+    .tv-content { padding: 10px 10px 2px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .tv-content, .tv-flash, .tv.off .tv-content { animation-duration: .01s; animation-delay: 0s; }
+}
+
+
+
+/* ---------- Timeline: real-time spacing ---------- */
+#tl-track.spaced { min-height: 80px; }
+#tl-track.spaced .tl-item {
+    position: absolute;
+    width: 50%;
+    margin-left: 0;
+    padding-bottom: 0;
+}
+#tl-track.spaced .tl-item.left  { left: 0; }
+#tl-track.spaced .tl-item.right { left: 50%; }
+#tl-track.spaced .tl-year {
+    position: absolute;
+    left: 0; right: 0;
+    margin: 0;
+}
+
+@media (max-width: 700px) {
+    #tl-track.spaced .tl-item,
+    #tl-track.spaced .tl-item.left,
+    #tl-track.spaced .tl-item.right {
+        left: 0;
+        width: 100%;
+        padding: 0 0 0 40px;
+    }
+}

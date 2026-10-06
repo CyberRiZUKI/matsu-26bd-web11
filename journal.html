@@ -11,32 +11,55 @@
 <nav class="top">
     <a class="home" href="index.html">主页</a>
     <a href="chat.html">粉丝互动</a>
-    <a href="journal.html">综艺热度</a>
+    <a class="active" href="journal.html">综艺热度</a>
     <a href="mediavariety.html">音乐音番</a>
     <a href="map.html">巡礼地图</a>
     <a href="blog.html">博客收据</a>
-    <a class="active" href="disclaimer.html">钞组资讯</a>
+    <a href="disclaimer.html">钞组资讯</a>
 </nav>
 
 <main>
     <h1>综艺热度表</h1>
 
-    <div class="box">
-        <p id="j-status">LOADING JOURNAL...</p>
-        <div id="j-controls" style="display:none">
-            <label>YEAR <select id="j-year"></select></label>
-            <div id="j-sheets"></div>
-        </div>
-    </div>
+    <div class="tv" id="tv">
+        <div class="tv-body">
 
-    <div class="box" id="heat-box" style="display:none">
-        <div id="heat-scroll">
-            <div id="heat-months"></div>
-            <div id="heat"></div>
+            <div class="tv-screen">
+                <div class="tv-hint">▶ PRESS POWER</div>
+
+                <div class="tv-content">
+                    <!-- heatmap box (now first) -->
+                    <div class="box" id="heat-box" style="display:none">
+                        <div id="heat-scroll">
+                            <div id="heat-months"></div>
+                            <div id="heat"></div>
+                        </div>
+                        <div id="heat-legend">
+                            LESS <i class="lv0"></i><i class="lv1"></i><i class="lv2"></i><i class="lv3"></i><i class="lv4"></i> MORE
+                        </div>
+                    </div>
+
+                    <!-- controls box (now second) -->
+                    <div class="box">
+                        <p id="j-status">LOADING JOURNAL...</p>
+                        <div id="j-controls" style="display:none">
+                            <label>YEAR <select id="j-year"></select></label>
+                            <div id="j-sheets"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tv-flash"></div>
+            </div>
+
+            <div class="tv-panel">
+                <div class="tv-led"></div>
+                <div class="tv-grille"></div>
+                <button class="tv-power" id="tv-power" type="button" aria-label="Power" aria-pressed="true">PWR</button>
+            </div>
         </div>
-        <div id="heat-legend">
-            LESS <i class="lv0"></i><i class="lv1"></i><i class="lv2"></i><i class="lv3"></i><i class="lv4"></i> MORE
-        </div>
+
+        <div class="tv-legs"><i></i><i></i></div>
     </div>
 
     <div class="box" id="detail-box" style="display:none">
@@ -46,10 +69,20 @@
     </div>
 </main>
 
-
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script src="journal.js"></script>
+
+<script>
+    /* TV power button: off and on again */
+    (() => {
+        const tv = document.getElementById("tv");
+        const btn = document.getElementById("tv-power");
+        btn.addEventListener("click", () => {
+            const off = tv.classList.toggle("off");
+            btn.setAttribute("aria-pressed", String(!off));
+        });
+    })();
+</script>
 </body>
 </html>

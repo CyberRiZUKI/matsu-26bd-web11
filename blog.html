@@ -155,6 +155,18 @@
             border-radius: 6px;
         }
 
+        /* PRESS START button: centred in the printer */
+        .printer .printer-start {
+            position: absolute;
+            left: 0; right: 0;
+            top: 50px;
+            margin: 0 auto;
+            width: fit-content;
+            padding: 6px 14px;
+            z-index: 1;
+        }
+        .printer .printer-start[hidden] { display: none; }
+
         /* paper feed: clips the receipt so it appears from under the slot */
         .feed {
             width: 100%;
@@ -169,6 +181,9 @@
         .receipt-tools { opacity: 0; transition: opacity .6s .3s; }
 
         /* states */
+        .waiting .feed,
+        .waiting .receipt-tools { display: none; }
+
         .printing .printer { animation: shake .12s steps(2) infinite; }
         .printing .printer .led { animation: blink .5s steps(2) infinite; }
         .printing .feed .receipt { animation: feed 4s steps(40, end) forwards; }
@@ -219,9 +234,10 @@
 
         <div class="printer-box" id="printer">
             <div class="printer">
-                <div class="screen" id="p-screen">WARMING UP...</div>
+                <div class="screen" id="p-screen">READY</div>
                 <div class="led"></div>
                 <div class="btns"></div>
+                <button class="btn printer-start" id="start-btn" type="button" hidden>PRESS START ▶</button>
                 <div class="slot"></div>
             </div>
         </div>
@@ -297,7 +313,29 @@
         };
 
         /* ---------- Printer opening act ---------- */
-        let started = false;
+        let started = false, clicked = false, loaded = false;
+
+        const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduced) {
+            clicked = true;                         // no printer, no button, no animation
+        } else {
+            document.body.classList.add("waiting"); // printer visible, paper hidden
+            $("start-btn").hidden = false;
+        }
+
+        $("start-btn").addEventListener("click", e => {
+            e.stopPropagation();                    // don't trigger the stage's click-to-skip
+            clicked = true;
+            $("start-btn").hidden = true;
+            $("p-screen").textContent = "WARMING UP...";
+            document.body.classList.remove("waiting");
+            tryStart();
+        });
+
+        function tryStart() {
+            if (clicked && loaded) startPrint();
+        }
+
         function startPrint() {
             if (started) return;
             started = true;
@@ -390,7 +428,8 @@
             $("r-code").textContent =
                 first.blog.replace(/\D/g, "") + last.blog.replace(/\D/g, "") + String(photos).padStart(4, "0");
 
-            startPrint();
+            loaded = true;
+            tryStart();
         }
 
         fetch(XLSX_FILE)
@@ -399,7 +438,8 @@
             .catch(err => {
                 console.error(err);
                 $("r-status").textContent = "ERROR: " + err.message;
-                startPrint();
+                loaded = true;
+                tryStart();
             });
     })();
 </script>
