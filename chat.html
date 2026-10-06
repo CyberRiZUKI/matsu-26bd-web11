@@ -5,6 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>松田里奈生贺</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* ---------- Chat opening ---------- */
+        .chat:not(.opened) > .tabs,
+        .chat:not(.opened) > .bar,
+        .chat:not(.opened) > .room { display: none; }
+        .chat.opened > .intro { display: none; }
+        .chat.opened > .tabs,
+        .chat.opened > .bar,
+        .chat.opened > .room { animation: introIn .5s ease-out; }
+
+        .intro {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            justify-content: center;
+            min-height: 300px;
+            padding: 28px 18px;
+        }
+        .im {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity .2s ease-out, transform .2s ease-out;
+        }
+        .im.show { opacity: 1; transform: none; }
+        .im.me  { justify-content: flex-end; }
+        .im.her { justify-content: flex-start; }
+
+        .ia {
+            flex: 0 0 auto;
+            width: 40px; height: 40px;
+            display: grid; place-items: center;
+            font-size: 22px;
+            background: var(--pink, #ffc8dd);
+            border: 2px solid var(--text);
+            border-radius: 50%;
+        }
+        .ib {
+            max-width: 75%;
+            padding: 10px 16px;
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--text);
+            border: 2px solid var(--text);
+            box-shadow: 3px 3px 0 var(--shadow);
+        }
+        .im.me  .ib { background: var(--green, #b8f2c9); border-radius: 16px 16px 4px 16px; }
+        .im.her .ib { background: #fffdf7;               border-radius: 16px 16px 16px 4px; }
+
+        .ib.typing { display: inline-flex; gap: 5px; padding: 14px 16px; }
+        .ib.typing i {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--text);
+            animation: dotBounce 1s infinite;
+        }
+        .ib.typing i:nth-child(2) { animation-delay: .15s; }
+        .ib.typing i:nth-child(3) { animation-delay: .3s; }
+
+        .open-wrap {
+            text-align: center;
+            margin-top: 8px;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity .3s ease-out, transform .3s ease-out;
+            pointer-events: none;
+        }
+        .open-wrap.show { opacity: 1; transform: none; pointer-events: auto; }
+
+        @keyframes dotBounce { 0%, 60%, 100% { transform: translateY(0); opacity: .4; }
+            30% { transform: translateY(-5px); opacity: 1; } }
+        @keyframes introIn   { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+        @media (prefers-reduced-motion: reduce) {
+            .im, .open-wrap { transition: none; }
+            .chat.opened > .tabs, .chat.opened > .bar, .chat.opened > .room { animation: none; }
+        }
+    </style>
 </head>
 <body>
 
@@ -22,6 +102,22 @@
     <h1>粉丝互动</h1>
 
     <div class="chat">
+
+        <!-- opening -->
+        <div class="intro" id="c-intro">
+            <div class="im me" id="im1">
+                <div class="ib">今日もお疲れ様</div>
+            </div>
+            <div class="im her" id="im2">
+                <div class="ia">🌸</div>
+                <div class="ib" id="im2-text">いつもありがとう</div>
+            </div>
+            <div class="open-wrap" id="c-open-wrap">
+                <button class="btn" id="c-open">显示历史记录</button>
+            </div>
+        </div>
+
+        <!-- existing chat, hidden until the button is clicked -->
         <div class="tabs" id="c-tabs"></div>
 
         <div class="bar">

@@ -93,9 +93,110 @@
 
         .receipt-tools { margin-top: 24px; }
 
+        /* ---------- Printer opening act ---------- */
+        .printer-box {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 440px;
+            height: 130px;
+            transition: transform .9s cubic-bezier(.5, 0, .9, .4),
+            opacity .8s ease-in .1s,
+            height .9s ease-in-out .15s;
+        }
+        .printer {
+            position: absolute;
+            inset: 0 0 6px 0;
+            background: var(--pink, #ffc8dd);
+            border: 3px solid var(--text);
+            border-radius: 14px 14px 8px 8px;
+            box-shadow: 6px 6px 0 var(--shadow);
+        }
+        .printer::before {                        /* paper tray on top */
+            content: "";
+            position: absolute;
+            left: 22%; right: 22%; top: -16px;
+            height: 16px;
+            background: #fffdf7;
+            border: 3px solid var(--text);
+            border-bottom: 0;
+            border-radius: 4px 4px 0 0;
+        }
+        .printer .screen {                        /* little display */
+            position: absolute;
+            left: 14px; top: 18px;
+            padding: 4px 10px;
+            background: var(--ink, #2b2b2b);
+            color: var(--green, #b8f2c9);
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+        .printer .led {
+            position: absolute;
+            right: 18px; top: 24px;
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: var(--yellow, #ffe680);
+            border: 2px solid var(--text);
+        }
+        .printer .btns {
+            position: absolute;
+            right: 18px; top: 50px;
+            width: 40px; height: 10px;
+            background: repeating-linear-gradient(90deg,
+            var(--text) 0 8px, transparent 8px 16px);
+            opacity: .5;
+        }
+        .printer .slot {                          /* the opening the paper comes out of */
+            position: absolute;
+            left: 6%; right: 6%; bottom: 14px;
+            height: 12px;
+            background: var(--text);
+            border-radius: 6px;
+        }
+
+        /* paper feed: clips the receipt so it appears from under the slot */
+        .feed {
+            width: 100%;
+            max-width: 400px;
+            margin-top: -8px;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+        .feed .receipt { transform: translateY(-101%); }
+
+        .receipt-tools { opacity: 0; transition: opacity .6s .3s; }
+
+        /* states */
+        .printing .printer { animation: shake .12s steps(2) infinite; }
+        .printing .printer .led { animation: blink .5s steps(2) infinite; }
+        .printing .feed .receipt { animation: feed 4s steps(40, end) forwards; }
+        .skip .feed .receipt { animation-duration: .05s; }
+
+        .printed .printer-box {
+            transform: translateY(-90px);
+            opacity: 0;
+            height: 0;
+        }
+        .printed .receipt-tools { opacity: 1; }
+        .printed .feed .receipt { transform: none; }
+
+        @keyframes feed  { from { transform: translateY(-101%); } to { transform: translateY(0); } }
+        @keyframes shake { 0% { transform: translateX(-1px); } 100% { transform: translateX(1px); } }
+        @keyframes blink { 50% { opacity: .2; } }
+
+        @media (prefers-reduced-motion: reduce) {
+            .printer-box { display: none; }
+            .feed .receipt { transform: none; }
+            .receipt-tools { opacity: 1; }
+        }
+
         @media print {
             nav.top, footer, main > h1, .receipt-tools { display: none; }
             .receipt { box-shadow: none; }
+            .printer-box { display: none; }
+            .feed .receipt { transform: none; animation: none; }
         }
     </style>
 </head>
@@ -114,38 +215,50 @@
 <main>
     <h1>博客收据</h1>
 
-    <div class="receipt-wrap">
-        <div class="receipt">
-            <div class="center">
-                <div class="logo">🌸</div>
-                <h2 class="shop">BLOG STORE</h2>
-                <p class="sub">sakurazaka46.com / diary</p>
+    <div class="receipt-wrap" id="stage">
+
+        <div class="printer-box" id="printer">
+            <div class="printer">
+                <div class="screen" id="p-screen">WARMING UP...</div>
+                <div class="led"></div>
+                <div class="btns"></div>
+                <div class="slot"></div>
             </div>
+        </div>
 
-            <hr class="rule">
-            <div class="meta">
-                <span id="r-range">—</span>
-                <span id="r-count">—</span>
-            </div>
-            <hr class="rule">
+        <div class="feed">
+            <div class="receipt">
+                <div class="center">
+                    <div class="logo">🌸</div>
+                    <h2 class="shop">BLOG STORE</h2>
+                    <p class="sub">sakurazaka46.com / diary</p>
+                </div>
 
-            <div class="head"><span>NO. TITLE</span><span>PHOTOS</span></div>
-            <hr class="rule solid">
+                <hr class="rule">
+                <div class="meta">
+                    <span id="r-range">—</span>
+                    <span id="r-count">—</span>
+                </div>
+                <hr class="rule">
 
-            <p id="r-status">LOADING RECEIPT...</p>
-            <div id="r-items"></div>
+                <div class="head"><span>NO. TITLE</span><span>PHOTOS</span></div>
+                <hr class="rule solid">
 
-            <hr class="rule solid">
-            <div class="row"><span>POSTS</span><span id="t-posts">0</span></div>
-            <div class="row"><span>AVG PHOTOS / POST</span><span id="t-avg">0</span></div>
-            <div class="row big"><span>TOTAL PHOTOS</span><b id="t-photos">0</b></div>
-            <hr class="rule">
+                <p id="r-status">LOADING RECEIPT...</p>
+                <div id="r-items"></div>
 
-            <div class="center">
-                <p class="thanks">THANK YOU ♥ SEE YOU NEXT POST</p>
-                <div class="stamp">PAID</div>
-                <div class="barcode"></div>
-                <div class="code" id="r-code">0000000000</div>
+                <hr class="rule solid">
+                <div class="row"><span>POSTS</span><span id="t-posts">0</span></div>
+                <div class="row"><span>AVG PHOTOS / POST</span><span id="t-avg">0</span></div>
+                <div class="row big"><span>TOTAL PHOTOS</span><b id="t-photos">0</b></div>
+                <hr class="rule">
+
+                <div class="center">
+                    <p class="thanks">THANK YOU ♥ SEE YOU NEXT POST</p>
+                    <div class="stamp">PAID</div>
+                    <div class="barcode"></div>
+                    <div class="code" id="r-code">0000000000</div>
+                </div>
             </div>
         </div>
 
@@ -154,8 +267,6 @@
         </div>
     </div>
 </main>
-
-
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -184,6 +295,31 @@
             const s = String(d).replace(/\D/g, "");
             return s.length >= 8 ? `${s.slice(0, 4)}.${s.slice(4, 6)}.${s.slice(6, 8)}` : String(d);
         };
+
+        /* ---------- Printer opening act ---------- */
+        let started = false;
+        function startPrint() {
+            if (started) return;
+            started = true;
+
+            const body = document.body;
+            const printer = $("printer");
+            const receipt = document.querySelector(".receipt");
+            $("p-screen").textContent = "PRINTING...";
+            body.classList.add("printing");
+
+            // click anywhere on the stage to skip
+            $("stage").addEventListener("click", () => body.classList.add("skip"), { once: true });
+
+            receipt.addEventListener("animationend", () => {
+                $("p-screen").textContent = "DONE ♥";
+                setTimeout(() => {
+                    body.classList.remove("printing");
+                    body.classList.add("printed");              // printer floats up and fades
+                    setTimeout(() => printer.remove(), 1300);   // clean up after the fade
+                }, 400);
+            }, { once: true });
+        }
 
         function readWorkbook(buf) {
             const wb = XLSX.read(buf, { type: "array" });
@@ -253,6 +389,8 @@
             $("t-avg").textContent = (photos / items.length).toFixed(1);
             $("r-code").textContent =
                 first.blog.replace(/\D/g, "") + last.blog.replace(/\D/g, "") + String(photos).padStart(4, "0");
+
+            startPrint();
         }
 
         fetch(XLSX_FILE)
@@ -261,6 +399,7 @@
             .catch(err => {
                 console.error(err);
                 $("r-status").textContent = "ERROR: " + err.message;
+                startPrint();
             });
     })();
 </script>

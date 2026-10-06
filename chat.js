@@ -245,6 +245,41 @@
         render(true);
     });
 
+    /* ---------- opening ---------- */
+    (() => {
+        const chat = document.querySelector(".chat");
+        const m1 = $("im1"), m2 = $("im2");
+        const wrap = $("c-open-wrap");
+        const timers = [];
+        const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+
+        function showAll() {                       // jump to the final state
+            timers.forEach(clearTimeout);
+            m1.classList.add("show");
+            m2.classList.add("show");
+            wrap.classList.add("show");
+        }
+
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            showAll();
+        } else {
+            later(() => m1.classList.add("show"), 500);     // right: 今日もお疲れ様
+            later(() => m2.classList.add("show"), 1500);    // left: いつもありがとう
+            later(() => wrap.classList.add("show"), 2300);  // the button
+
+            $("c-intro").addEventListener("click", e => {   // click anywhere to skip
+                if (e.target.id !== "c-open") showAll();
+            });
+        }
+
+        $("c-open").addEventListener("click", () => {
+            chat.classList.add("opened");
+            render(true);                          // re-render now that the room is visible
+        });
+    })();
+
+
+
     /* ---------- load ---------- */
     fetch(XLSX_FILE)
         .then(r => { if (!r.ok) throw new Error("HTTP " + r.status + " for " + XLSX_FILE); return r.arrayBuffer(); })
