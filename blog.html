@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>松田里奈生贺</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ---------- Receipt (scoped to .receipt) ---------- */
+        .receipt-wrap { display: flex; flex-direction: column; align-items: center; margin: 24px 0; }
+
+        .receipt {
+            width: 100%;
+            max-width: 400px;
+            padding: 28px 22px 34px;
+            background: #fffdf7;
+            color: var(--text);
+            box-shadow: 6px 6px 0 var(--shadow);
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+            --z: 10px;
+            -webkit-mask:
+                    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(var(--z) * 2) 51% repeat-x,
+                    conic-gradient(from 135deg at top,    #0000, #000 1deg 89deg, #0000 90deg) top / calc(var(--z) * 2) 51% repeat-x;
+            mask:
+                    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(var(--z) * 2) 51% repeat-x,
+                    conic-gradient(from 135deg at top,    #0000, #000 1deg 89deg, #0000 90deg) top / calc(var(--z) * 2) 51% repeat-x;
+        }
+        .receipt * { box-sizing: border-box; }
+
+        .receipt .center { text-align: center; }
+        .receipt .logo   { font-size: 30px; line-height: 1; color: var(--pink-d); }
+        .receipt .shop   { margin: 6px 0 0; font-size: 20px; letter-spacing: 3px; color: var(--text); }
+        .receipt .sub    { margin: 2px 0 0; font-size: 12px; opacity: .7; }
+
+        .receipt .rule       { border: 0; border-top: 2px dashed var(--text); margin: 14px 0; opacity: .5; }
+        .receipt .rule.solid { border-top-style: solid; opacity: .8; }
+
+        .receipt .meta, .receipt .head { display: flex; justify-content: space-between; font-size: 12px; }
+        .receipt .head { letter-spacing: 1px; }
+        .receipt #r-status { text-align: center; font-size: 12px; opacity: .7; margin: 10px 0; }
+
+        /* items */
+        .receipt .item { margin: 12px 0; }
+        .receipt .line1, .receipt .line2 { display: flex; gap: 8px; align-items: baseline; }
+        .receipt .line1 .no  { flex: 0 0 auto; opacity: .55; }
+        .receipt .line1 .ttl {
+            flex: 1;
+            font-size: 15px;
+            color: var(--text);
+            text-decoration: none;
+            word-break: break-word;
+        }
+        .receipt .line1 a.ttl:hover { background: var(--yellow); }
+        .receipt .line1 .qty {
+            flex: 0 0 auto;
+            padding: 0 6px;
+            background: var(--green);
+            border: 1px solid var(--green-d);
+            color: var(--ink);
+            font-size: 13px;
+        }
+        .receipt .line2 { padding-left: 26px; font-size: 12px; opacity: .7; }
+        .receipt .line2 .dots { flex: 1; border-bottom: 1px dotted var(--text); transform: translateY(-4px); opacity: .6; }
+
+        /* totals */
+        .receipt .row { display: flex; justify-content: space-between; margin: 3px 0; }
+        .receipt .row.big { font-size: 18px; margin-top: 8px; }
+        .receipt .row.big b { background: var(--yellow); padding: 0 6px; border: 1px solid var(--yellow-d); }
+
+        .receipt .thanks { margin: 6px 0 0; font-size: 13px; }
+        .receipt .barcode {
+            height: 52px;
+            margin: 14px auto 6px;
+            width: 80%;
+            background: repeating-linear-gradient(90deg,
+            var(--text) 0 2px, transparent 2px 4px,
+            var(--text) 4px 5px, transparent 5px 9px,
+            var(--text) 9px 12px, transparent 12px 14px,
+            var(--text) 14px 15px, transparent 15px 19px);
+        }
+        .receipt .code { letter-spacing: 4px; font-size: 11px; opacity: .7; }
+        .receipt .stamp {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 2px 12px;
+            border: 2px solid var(--pink-d);
+            color: var(--pink-d);
+            transform: rotate(-6deg);
+            letter-spacing: 3px;
+        }
+
+        .receipt-tools { margin-top: 24px; }
+
+        @media print {
+            nav.top, footer, main > h1, .receipt-tools { display: none; }
+            .receipt { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="top">
+    <a class="home" href="index.html">主页</a>
+    <a href="chat.html">粉丝互动</a>
+    <a href="journal.html">综艺热度</a>
+    <a href="mediavariety.html">音乐音番</a>
+    <a href="map.html">巡礼地图</a>
+    <a href="blog.html">博客收据</a>
+    <a class="active" href="disclaimer.html">钞组资讯</a>
+</nav>
+
+<main>
+    <h1>博客收据</h1>
+
+    <div class="receipt-wrap">
+        <div class="receipt">
+            <div class="center">
+                <div class="logo">🌸</div>
+                <h2 class="shop">BLOG STORE</h2>
+                <p class="sub">sakurazaka46.com / diary</p>
+            </div>
+
+            <hr class="rule">
+            <div class="meta">
+                <span id="r-range">—</span>
+                <span id="r-count">—</span>
+            </div>
+            <hr class="rule">
+
+            <div class="head"><span>NO. TITLE</span><span>PHOTOS</span></div>
+            <hr class="rule solid">
+
+            <p id="r-status">LOADING RECEIPT...</p>
+            <div id="r-items"></div>
+
+            <hr class="rule solid">
+            <div class="row"><span>POSTS</span><span id="t-posts">0</span></div>
+            <div class="row"><span>AVG PHOTOS / POST</span><span id="t-avg">0</span></div>
+            <div class="row big"><span>TOTAL PHOTOS</span><b id="t-photos">0</b></div>
+            <hr class="rule">
+
+            <div class="center">
+                <p class="thanks">THANK YOU ♥ SEE YOU NEXT POST</p>
+                <div class="stamp">PAID</div>
+                <div class="barcode"></div>
+                <div class="code" id="r-code">0000000000</div>
+            </div>
+        </div>
+
+        <div class="receipt-tools">
+            <button class="btn" onclick="window.print()">PRINT ▶</button>
+        </div>
+    </div>
+</main>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+    (() => {
+        const XLSX_FILE = "workdata.xlsx";
+
+// Sheet tab to read. Leave "" to auto-detect the sheet that has a 博客标题 column.
+        const SHEET = "";
+
+// Header keywords (partial match). Fallback = column position (A = 0).
+        const COLS = {
+            no:    { key: "序号",     pos: 0 },
+            date:  { key: "日期",     pos: 1 },
+            blog:  { key: "博客序号", pos: 2 },
+            time:  { key: "发布时间", pos: 3 },
+            title: { key: "博客标题", pos: 4 },
+            count: { key: "图片数",   pos: 5 },
+            url:   { key: "官网链接", pos: 6 }
+        };
+
+        const $ = id => document.getElementById(id);
+        const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+            ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        const fmtDate = d => {
+            const s = String(d).replace(/\D/g, "");
+            return s.length >= 8 ? `${s.slice(0, 4)}.${s.slice(4, 6)}.${s.slice(6, 8)}` : String(d);
+        };
+
+        function readWorkbook(buf) {
+            const wb = XLSX.read(buf, { type: "array" });
+            const toRows = n => XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: false, defval: "" });
+
+            let name = SHEET;
+            if (!name) {
+                name = wb.SheetNames.find(n => (toRows(n)[0] || []).some(h => String(h).includes(COLS.title.key)));
+            }
+            if (!name || !wb.Sheets[name]) throw new Error("No sheet with a 博客标题 column. Set SHEET in the script.");
+
+            const rows = toRows(name);
+            const headers = (rows[0] || []).map(h => String(h).trim());
+            const idx = {};
+            for (const k in COLS) {
+                const i = headers.findIndex(h => h.includes(COLS[k].key));
+                idx[k] = i !== -1 ? i : COLS[k].pos;
+            }
+            const get = (r, k) => String(r[idx[k]] ?? "").trim();
+
+            const items = rows.slice(1)
+                .filter(r => get(r, "title") !== "")
+                .map((r, i) => ({
+                    n:     get(r, "no") || String(i + 1),
+                    date:  get(r, "date"),
+                    blog:  get(r, "blog"),
+                    time:  get(r, "time"),
+                    title: get(r, "title"),
+                    count: parseInt(get(r, "count"), 10) || 0,
+                    url:   get(r, "url")
+                }));
+
+            if (!items.length) throw new Error("Sheet '" + name + "' has no rows.");
+            render(items);
+        }
+
+        function render(items) {
+            let photos = 0;
+            $("r-items").innerHTML = items.map((it, i) => {
+                photos += it.count;
+                const num  = String(i + 1).padStart(2, "0");
+                const safe = /^https?:\/\//i.test(it.url) ? it.url : "";
+                const title = safe
+                    ? `<a class="ttl" href="${esc(safe)}" target="_blank" rel="noopener">${esc(it.title)}</a>`
+                    : `<span class="ttl">${esc(it.title)}</span>`;
+                return `
+    <div class="item">
+      <div class="line1">
+        <span class="no">${num}</span>
+        ${title}
+        <span class="qty">×${it.count}</span>
+      </div>
+      <div class="line2">
+        <span>${esc(it.blog)}</span>
+        <span class="dots"></span>
+        <span>${esc(it.time)}${it.time ? " JST" : ""}</span>
+      </div>
+    </div>`;
+            }).join("");
+
+            const first = items[0], last = items[items.length - 1];
+            $("r-status").style.display = "none";
+            $("r-range").textContent = `${fmtDate(first.date)} – ${fmtDate(last.date)}`;
+            $("r-count").textContent = `${items.length} ITEMS`;
+            $("t-posts").textContent = items.length;
+            $("t-photos").textContent = photos;
+            $("t-avg").textContent = (photos / items.length).toFixed(1);
+            $("r-code").textContent =
+                first.blog.replace(/\D/g, "") + last.blog.replace(/\D/g, "") + String(photos).padStart(4, "0");
+        }
+
+        fetch(XLSX_FILE)
+            .then(r => { if (!r.ok) throw new Error("HTTP " + r.status + " for " + XLSX_FILE); return r.arrayBuffer(); })
+            .then(readWorkbook)
+            .catch(err => {
+                console.error(err);
+                $("r-status").textContent = "ERROR: " + err.message;
+            });
+    })();
+</script>
+</body>
+</html>

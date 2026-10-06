@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>松田里奈生贺</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="top">
+    <a class="home" href="index.html">主页</a>
+    <a href="chat.html">粉丝互动</a>
+    <a href="journal.html">综艺热度</a>
+    <a href="mediavariety.html">音乐音番</a>
+    <a href="map.html">巡礼地图</a>
+    <a href="blog.html">博客收据</a>
+    <a class="active" href="disclaimer.html">钞组资讯</a>
+</nav>
+
+<main>
+    <h1>巡礼地图</h1>
+
+    <div class="box">
+        <p id="map-status">LOADING PLACES...</p>
+        <div id="tag-filter"></div>
+        <label class="btn" id="csv-pick" style="display:none">
+            LOAD CSV ▶ <input type="file" id="csv-file" accept=".csv" hidden>
+        </label>
+        <button class="btn" id="export-btn" style="display:none">SAVE CSV WITH COORDS ▶</button>
+    </div>
+
+    <div id="map"></div>
+</main>
+
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="map.js"></script>
+</body>
+</html>
