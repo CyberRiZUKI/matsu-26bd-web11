@@ -708,3 +708,57 @@ table.jt tr:hover td { background: color-mix(in srgb, var(--yellow) 25%, var(--b
         padding: 0 0 0 40px;
     }
 }
+
+/* ---------- Map popup photo ---------- */
+.pop-pic {
+    display: block;
+    width: 260px;
+    max-width: 100%;
+    height: auto;
+    margin: 0 0 8px;
+    border: 2px solid var(--text);
+    box-shadow: 3px 3px 0 var(--shadow);
+}
+/* ---------- Map popup close button ---------- */
+.leaflet-container a.leaflet-popup-close-button {
+    top: -12px !important;
+    right: -12px !important;
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background: var(--pink-d, #ff7aa8) !important;
+    color: #fff !important;
+    border: 2px solid var(--text, #3a2f25) !important;
+    box-shadow: 2px 2px 0 var(--shadow, rgba(0, 0, 0, .25));
+    font: bold 20px/1 monospace !important;
+    text-decoration: none;
+    cursor: pointer;
+    z-index: 5;
+    transition: transform .1s steps(2), background .1s;
+}
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus-visible {
+    background: var(--yellow, #ffe680) !important;
+    color: var(--text, #3a2f25) !important;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--shadow, rgba(0, 0, 0, .25));
+    outline: none;
+}
+.leaflet-container a.leaflet-popup-close-button:active {
+    transform: translate(1px, 1px);
+    box-shadow: 0 0 0 transparent;
+}
+
+/* leave room so the photo doesn't sit under the button */
+.leaflet-popup-content { margin-top: 14px; }
+
+/* ---------- Map fills the rest of the screen ---------- */
+#map {
+    height: calc(100vh - 200px);    /* window height minus nav + heading + margins */
+    height: calc(100dvh - 200px);   /* better on phones; ignored by old browsers */
+    min-height: 320px;              /* never gets squashed on short screens */
+}
+

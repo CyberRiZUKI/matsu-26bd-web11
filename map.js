@@ -1,20 +1,14 @@
 const CSV_FILE = "Matsuri_1stPB_coords.csv";
+const PICS_DIR = "pics/";
 const CACHE_KEY = "sakura-geocache-v1";
 
-const map = L.map("map").setView([22.3193, 114.1694], 11); // starting view: Hong Kong
+const map = L.map("map", { closePopupOnClick: true }).setView([22.3193, 114.1694], 11); // starting view: Hong Kong
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: "© OpenStreetMap contributors"
 }).addTo(map);
 
-const statusEl = document.getElementById("map-status");
-const filterEl = document.getElementById("tag-filter");
-const exportBtn = document.getElementById("export-btn");
-const pickBtn = document.getElementById("csv-pick");
-const fileInput = document.getElementById("csv-file");
-
 let places = [];        // {row, marker}
-let activeTags = new Set();
 const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
 
 /* ---------- CSV parser (handles quotes, commas, line breaks) ---------- */
@@ -73,19 +67,33 @@ async function geocode(title) {
     return null;
 }
 
-/* ---------- Markers ---------- */
+/* ---------- Photos & tags ---------- */
 const esc = s => String(s).replace(/[&<>"']/g, c =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
+const IMG_RE = /\.(jpe?g|png|gif|webp|avif)$/i;
+
+// Photo = "Pic" column if present, else a Tags value that looks like an image filename
+const picOf = r => r.Pic || (IMG_RE.test(r.Tags || "") ? r.Tags : "");
+
+// Real tags only (a filename in the Tags column is not a tag)
+const tagsOf = r => IMG_RE.test((r.Tags || "").trim()) ? []
+    : (r.Tags || "").split(/[,;|]/).map(t => t.trim()).filter(Boolean);
+
+/* ---------- Markers ---------- */
 const pinIcon = L.divIcon({
     className: "pin", html: "<div class='pin-dot'></div>",
     iconSize: [24, 28], iconAnchor: [12, 28], popupAnchor: [0, -28]
 });
 
-const tagsOf = r => (r.Tags || "").split(/[,;|]/).map(t => t.trim()).filter(Boolean);
-
 function popupHTML(r) {
-    let h = `<h3>${esc(r.Title)}</h3>`;
+    let h = "";
+    const pic = picOf(r);
+    if (pic) {
+        h += `<img class="pop-pic" src="${PICS_DIR}${encodeURIComponent(pic)}" alt="${esc(r.Title)}"
+                   onerror="this.remove()">`;
+    }
+    h += `<h3>${esc(r.Title)}</h3>`;
     if (r.Note)    h += `<p>${esc(r.Note)}</p>`;
     if (r.Comment) h += `<p><em>${esc(r.Comment)}</em></p>`;
     const tags = tagsOf(r);
@@ -97,76 +105,39 @@ function popupHTML(r) {
 function addPlace(r, coords) {
     r.Lat = coords[0]; r.Lng = coords[1];
     const marker = L.marker(coords, { icon: pinIcon, title: r.Title })
-        .bindPopup(popupHTML(r)).addTo(map);
+        .bindPopup(popupHTML(r), {
+            minWidth: 220,
+            maxWidth: 300,
+            closeOnClick: true,        // click blank map = popup disappears
+            closeButton: true,
+            autoPanPadding: [30, 40]   // extra room so the corner button stays on screen
+        })
+        .addTo(map);
+
+    // once the photo finishes loading, re-measure the popup so it sits correctly above the pin
+    marker.on("popupopen", e => {
+        const img = e.popup.getElement().querySelector("img");
+        if (img && !img.complete) img.addEventListener("load", () => e.popup.update(), { once: true });
+    });
+
     places.push({ row: r, marker });
 }
-
-/* ---------- Tag filter ---------- */
-function buildFilter(rows) {
-    const all = [...new Set(rows.flatMap(tagsOf))].sort();
-    filterEl.innerHTML = "";
-    all.forEach(tag => {
-        const b = document.createElement("button");
-        b.className = "chip"; b.textContent = tag;
-        b.onclick = () => {
-            activeTags.has(tag) ? activeTags.delete(tag) : activeTags.add(tag);
-            b.classList.toggle("on");
-            applyFilter();
-        };
-        filterEl.appendChild(b);
-    });
-}
-
-function applyFilter() {
-    places.forEach(({ row, marker }) => {
-        const show = !activeTags.size || tagsOf(row).some(t => activeTags.has(t));
-        show ? marker.addTo(map) : marker.remove();
-    });
-}
-
-/* ---------- Export CSV with coordinates ---------- */
-function exportCSV() {
-    const cols = ["Title", "Note", "URL", "Tags", "Comment", "Lat", "Lng"];
-    const q = v => '"' + String(v ?? "").replace(/"/g, '""') + '"';
-    const csv = [cols.join(",")]
-        .concat(places.map(p => cols.map(c => q(p.row[c])).join(","))).join("\n");
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    a.download = "places-with-coords.csv";
-    a.click();
-}
-exportBtn.onclick = exportCSV;
 
 /* ---------- Main ---------- */
 async function loadRows(rows) {
     places.forEach(p => p.marker.remove()); places = [];
-    buildFilter(rows);
-    let missed = 0;
 
-    for (let i = 0; i < rows.length; i++) {
-        const r = rows[i];
+    for (const r of rows) {
         if (!r.Title) continue;
         let coords = coordsFromRow(r);
-        if (!coords) {
-            statusEl.textContent = `SEARCHING ${i + 1}/${rows.length}: ${r.Title}`;
-            coords = await geocode(r.Title);
-        }
-        if (coords) addPlace(r, coords); else missed++;
+        if (!coords) coords = await geocode(r.Title);
+        if (coords) addPlace(r, coords);
+        else console.warn("Not found:", r.Title);
         if (places.length) map.fitBounds(L.featureGroup(places.map(p => p.marker)).getBounds().pad(0.2));
     }
-    statusEl.textContent = `${places.length} PLACES ON MAP` + (missed ? ` · ${missed} NOT FOUND` : "");
-    if (places.length) exportBtn.style.display = "inline-block";
 }
 
 fetch(CSV_FILE)
-    .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+    .then(r => { if (!r.ok) throw new Error("HTTP " + r.status + " for " + CSV_FILE); return r.text(); })
     .then(t => loadRows(parseCSV(t)))
-    .catch(() => {
-        statusEl.textContent = "CAN'T READ places.csv AUTOMATICALLY. PICK THE FILE:";
-        pickBtn.style.display = "inline-block";
-    });
-
-fileInput.onchange = e => {
-    const f = e.target.files[0];
-    if (f) f.text().then(t => { pickBtn.style.display = "none"; loadRows(parseCSV(t)); });
-};
+    .catch(err => console.error("Can't load places:", err));
