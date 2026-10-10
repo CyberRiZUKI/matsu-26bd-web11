@@ -820,6 +820,32 @@ table.jt tr:hover td { background: color-mix(in srgb, var(--yellow) 25%, var(--b
 
 .tv.off .tv-arrow { opacity: .35; pointer-events: none; }
 
+/* ---------- Map starts fully hidden, JS fades it in ---------- */
+#map { opacity: 0; }
+#map.map-show {
+    opacity: 1;
+    transition: opacity 1s ease;   /* transition only applies to the fade-IN */
+}
+
+
+.map-wrap { position: relative; }
+
+#intro-layer {
+    position: absolute;
+    top: 0; left: 0;
+    overflow: hidden;          /* the plane can't leave the map box */
+    z-index: 1000;
+    pointer-events: none;
+}
+
+#intro-plane {
+    position: absolute;
+    width: 56px;
+    height: 56px;
+    filter: drop-shadow(3px 3px 0 var(--shadow, rgba(0, 0, 0, .25)));
+}
+#intro-plane svg { width: 100%; height: 100%; display: block; overflow: visible; }
+
 
 
 /* ---------- Bold across the whole site ---------- */

@@ -8,6 +8,76 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap contributors"
 }).addTo(map);
 
+/* ---------- Opening animation: plane flies inside the map box ---------- */
+(function intro() {
+    const mapEl = map.getContainer();
+    const showMap = () => mapEl.classList.add("map-show");
+
+    // reduced motion: no intro, just show the map
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) { showMap(); return; }
+
+    // safety net: the map always appears, even if something goes wrong
+    setTimeout(showMap, 6000);
+
+    // wrap the map so an overlay can sit exactly on top of it
+    const wrap = document.createElement("div");
+    wrap.className = "map-wrap";
+    mapEl.parentNode.insertBefore(wrap, mapEl);
+    wrap.appendChild(mapEl);
+
+    const W = mapEl.offsetWidth, H = mapEl.offsetHeight;
+
+    const layer = document.createElement("div");
+    layer.id = "intro-layer";
+    layer.style.width = W + "px";
+    layer.style.height = H + "px";
+    wrap.appendChild(layer);
+
+    const size = 56, margin = 10;
+    const plane = document.createElement("div");
+    plane.id = "intro-plane";
+    plane.style.left = margin + "px";
+    plane.style.top  = (H - size - margin) + "px";   // bottom-left of the map
+    plane.innerHTML = `
+        <svg viewBox="0 0 64 64" shape-rendering="crispEdges">
+            <defs>
+                <g id="plane-shape">
+                    <polygon points="62,32 52,27 10,27 3,32 10,37 52,37"/>
+                    <polygon points="30,32 14,5 23,5 46,29"/>
+                    <polygon points="30,32 14,59 23,59 46,35"/>
+                    <polygon points="12,32 4,21 10,21 20,30"/>
+                    <polygon points="12,32 4,43 10,43 20,34"/>
+                </g>
+            </defs>
+            <use href="#plane-shape" style="fill:var(--pink-d,#d9638c);stroke:var(--pink-d,#d9638c);stroke-width:6;stroke-linejoin:round"/>
+            <use href="#plane-shape" style="fill:var(--pink,#ffc4d5)"/>
+            <rect x="46" y="29" width="5" height="6" style="fill:var(--pink-d,#d9638c)"/>
+        </svg>`;
+    layer.appendChild(plane);
+
+    // bottom-left corner of the map to top-right corner of the map
+    const dx = W - size - margin * 2;
+    const dy = -(H - size - margin * 2);
+    const angle = Math.atan2(dy, dx) * 180 / Math.PI;   // nose points along the path
+
+    const flight = plane.animate(
+        [
+            { transform: `translate(0px, 0px) rotate(${angle}deg)` },
+            { transform: `translate(${dx}px, ${dy}px) rotate(${angle}deg)` }
+        ],
+        { duration: 2600, easing: "ease-in-out", fill: "forwards" }
+    );
+
+    flight.finished.then(() => {
+        showMap();                                        // 1. map fades in
+        setTimeout(() => {
+            plane.animate([{ opacity: 1 }, { opacity: 0 }],   // 2. plane fades out
+                { duration: 700, fill: "forwards" })
+                .finished.then(() => layer.remove());
+        }, 1000);
+    });
+})();
+
 let places = [];        // {row, marker}
 const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
 
