@@ -1,4 +1,4 @@
-const CSV_FILE = "Matsuri_1stPB.csv";
+const CSV_FILE = "Matsuri_1stPB_coords.csv";
 const CACHE_KEY = "sakura-geocache-v1";
 
 const map = L.map("map").setView([22.3193, 114.1694], 11); // starting view: Hong Kong
