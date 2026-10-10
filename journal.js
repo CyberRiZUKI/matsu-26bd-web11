@@ -56,10 +56,14 @@ function readWorkbook(buf) {
     const years = [...new Set(entries.map(e => +e.key.slice(0, 4)))].sort((a, b) => b - a);
     year = years[0] || new Date().getFullYear();
 
-    $("j-status").textContent =
-        `${entries.length} ENTRIES · ${Object.keys(sheetInfo).length} SHEETS` +
-        (skipped ? ` · ${skipped} ROWS SKIPPED (BAD DATE)` : "") +
-        (missing.length ? ` · SHEET NOT FOUND: ${missing.join(", ")}` : "");
+    const warn = [
+        skipped ? `${skipped} ROWS SKIPPED (BAD DATE)` : "",
+        missing.length ? `SHEET NOT FOUND: ${missing.join(", ")}` : ""
+    ].filter(Boolean).join(" · ");
+
+    $("j-status").textContent = warn;
+    $("j-status").style.display = warn ? "block" : "none";
+
 
     $("j-year").innerHTML = (years.length ? years : [year]).map(y => `<option>${y}</option>`).join("");
     $("j-controls").style.display = "block";
@@ -151,10 +155,31 @@ function renderDetail() {
     $("detail-box").style.display = "block";
 }
 
-function render() { renderHeat(); renderDetail(); }
+function render() { renderHeat(); renderDetail(); syncArrows(); }
 
 $("j-year").onchange = e => { year = +e.target.value; selectedDay = null; render(); };
 $("show-all").onclick = () => { selectedDay = null; render(); };
+
+/* ---------- TV arrows: scroll the heatmap sideways ---------- */
+const heatScroll = $("heat-scroll");
+const arrowLeft = $("tv-left");
+const arrowRight = $("tv-right");
+
+function syncArrows() {                       // dim an arrow when it can't move
+    arrowLeft.disabled  = heatScroll.scrollLeft <= 0;
+    arrowRight.disabled = heatScroll.scrollLeft + heatScroll.clientWidth >= heatScroll.scrollWidth - 1;
+}
+
+function scrollHeat(dir) {
+    const step = Math.max(120, heatScroll.clientWidth * 0.7);
+    heatScroll.scrollBy({ left: dir * step, behavior: "smooth" });
+}
+
+arrowLeft.addEventListener("click", () => scrollHeat(-1));
+arrowRight.addEventListener("click", () => scrollHeat(1));
+heatScroll.addEventListener("scroll", syncArrows);
+window.addEventListener("resize", syncArrows);
+syncArrows();
 
 /* ---------- Loading ---------- */
 fetch(XLSX_FILE)

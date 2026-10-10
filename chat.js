@@ -34,7 +34,7 @@
 
     let rooms = [];
     let active = "ALL";
-    let newestFirst = false;
+    let newestFirst = true;
 
     /* ---------- helpers ---------- */
     const TESTS = {
@@ -241,7 +241,7 @@
     $("c-search").addEventListener("input", () => render(false));
     $("c-sort").addEventListener("click", () => {
         newestFirst = !newestFirst;
-        $("c-sort").textContent = newestFirst ? "OLDEST ▲" : "NEWEST ▼";
+        $("c-sort").textContent = newestFirst ? "最新 ▼" : "最新 ▲";
         render(true);
     });
 

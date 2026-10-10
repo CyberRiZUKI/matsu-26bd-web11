@@ -28,7 +28,7 @@
                 <div class="tv-hint">▶ PRESS POWER</div>
 
                 <div class="tv-content">
-                    <!-- heatmap box (now first) -->
+                    <!-- heatmap box -->
                     <div class="box" id="heat-box" style="display:none">
                         <div id="heat-scroll">
                             <div id="heat-months"></div>
@@ -39,7 +39,7 @@
                         </div>
                     </div>
 
-                    <!-- controls box (now second) -->
+                    <!-- controls box -->
                     <div class="box">
                         <p id="j-status">LOADING JOURNAL...</p>
                         <div id="j-controls" style="display:none">
@@ -55,6 +55,12 @@
             <div class="tv-panel">
                 <div class="tv-led"></div>
                 <div class="tv-grille"></div>
+
+                <div class="tv-scroll">
+                    <button class="tv-arrow left"  id="tv-left"  type="button" aria-label="Scroll left"></button>
+                    <button class="tv-arrow right" id="tv-right" type="button" aria-label="Scroll right"></button>
+                </div>
+
                 <button class="tv-power" id="tv-power" type="button" aria-label="Power" aria-pressed="true">PWR</button>
             </div>
         </div>

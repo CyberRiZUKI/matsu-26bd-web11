@@ -20,9 +20,9 @@
     const NEWEST_FIRST = false;
 
     const COLORS = {
-        Books:  { f: "var(--green)",  d: "var(--green-d)" },
-        Movies: { f: "var(--yellow)", d: "var(--yellow-d)" },
-        Travel: { f: "var(--green)",  d: "var(--green-d)" }
+        "LIVE演出": { f: "var(--pink, #ffc8dd)", d: "var(--pink-d, #e58aa8)" },
+        "音番打歌": { f: "var(--yellow)", d: "var(--yellow-d)" },
+        "CD收录": { f: "var(--green)",  d: "var(--green-d)" }
     };
     const PALETTE = [
         { f: "var(--green)",  d: "var(--green-d)" },
@@ -99,10 +99,14 @@
         if (NEWEST_FIRST) entries.reverse();
 
         activeSheets = new Set(Object.keys(sheetColor));
-        $("tl-status").textContent =
-            `${entries.length} EVENTS` +
-            (skipped ? ` · ${skipped} ROWS SKIPPED (BAD DATE)` : "") +
-            (missing.length ? ` · SHEET NOT FOUND: ${missing.join(", ")}` : "");
+        const warn = [
+            skipped ? `${skipped} ROWS SKIPPED (BAD DATE)` : "",
+            missing.length ? `SHEET NOT FOUND: ${missing.join(", ")}` : ""
+        ].filter(Boolean).join(" · ");
+
+        $("tl-status").textContent = warn;
+        $("tl-status").style.display = warn ? "block" : "none";
+
 
         buildChips();
         render();
@@ -169,7 +173,7 @@
             `<article class="tl-card">` +
             `<div class="tl-date">${esc(dateLabel(e))}</div>` +
             (e.tag ? `<span class="tl-tag">${esc(e.tag)}</span>` : "") +
-            (e.title ? `<h3>${esc(e.title)}</h3>` : "") +
+            (e.title && !/^\d+$/.test(e.title) ? `<h3>${esc(e.title)}</h3>` : "") +
             (e.text ? `<p>${esc(e.text)}</p>` : "") +
             `<div class="tl-foot">${e.foot ? esc(e.foot) : ""}<em>${esc(e.sheet)}</em></div>` +
             `</article>`;
