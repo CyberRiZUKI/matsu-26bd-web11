@@ -6,7 +6,191 @@
     <title>松田里奈生贺</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* ---------- Receipt (scoped to .receipt) ---------- */
+        /* =========================================================
+           NEWSPAPER (top section, state classes live on #news-stage)
+           ========================================================= */
+        .news-wrap { display: flex; flex-direction: column; align-items: center; margin: 24px 0 48px; }
+
+        .np-printer {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+            max-width: 780px;
+            height: 120px;
+        }
+        .np-body {
+            position: absolute;
+            inset: 0 0 6px 0;
+            background: var(--green);
+            border: 3px solid var(--text);
+            border-radius: 10px 10px 6px 6px;
+            box-shadow: 6px 6px 0 var(--shadow), inset -6px -6px 0 var(--green-d);
+        }
+        .np-body::before {
+            content: "";
+            position: absolute;
+            left: 10%; right: 10%; top: -14px;
+            height: 14px;
+            background: #fffdf7;
+            border: 3px solid var(--text);
+            border-bottom: 0;
+        }
+        .np-screen {
+            position: absolute;
+            left: 14px; top: 16px;
+            padding: 4px 10px;
+            background: var(--ink);
+            color: var(--green);
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+        .np-led {
+            position: absolute;
+            right: 18px; top: 22px;
+            width: 12px; height: 12px;
+            background: var(--yellow);
+            border: 2px solid var(--text);
+        }
+        .np-btns {
+            position: absolute;
+            right: 18px; top: 46px;
+            width: 56px; height: 10px;
+            background: repeating-linear-gradient(90deg, var(--text) 0 8px, transparent 8px 16px);
+            opacity: .5;
+        }
+        .np-slot {
+            position: absolute;
+            left: 4%; right: 4%; bottom: 12px;
+            height: 12px;
+            background: var(--text);
+        }
+        .np-start {
+            position: absolute;
+            left: 0; right: 0; top: 44px;
+            margin: 0 auto;
+            width: fit-content;
+            padding: 6px 14px;
+        }
+        .np-start[hidden] { display: none; }
+
+        .np-feed {
+            width: 100%;
+            max-width: 740px;
+            margin-top: -8px;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+        .paper {
+            --paper: #f1e9d2;
+            --ink-n: #2e2a22;
+            position: relative;
+            padding: 22px 22px 30px;
+            background: var(--paper);
+            color: var(--ink-n);
+            box-shadow: inset 0 0 0 3px var(--ink-n), 6px 6px 0 var(--shadow);
+            transform: translateY(-101%);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        .paper * { box-sizing: border-box; }
+
+        .masthead { text-align: center; }
+        .masthead .flag { font-size: 11px; letter-spacing: 3px; opacity: .7; }
+        .masthead h2 {
+            margin: 6px 0 4px;
+            font-size: 34px;
+            letter-spacing: 4px;
+            color: var(--ink-n);
+            text-shadow: 3px 3px 0 var(--pink);
+        }
+        .masthead .tag { font-size: 11px; opacity: .75; }
+
+        .np-rule { border: 0; border-top: 3px double var(--ink-n); margin: 12px 0; }
+        .np-rule.thin { border-top: 2px solid var(--ink-n); }
+
+        .np-meta { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 11px; letter-spacing: 1px; }
+        #np-status { text-align: center; opacity: .7; margin: 14px 0; }
+
+        .np-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+        .np-col { padding: 0 14px; min-width: 0; }
+        .np-col:first-child { padding-left: 0; border-right: 2px solid var(--ink-n); }
+        .np-col:last-child  { padding-right: 0; }
+
+        .np-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 10px;
+            padding: 4px 10px;
+            background: var(--ink-n);
+            color: var(--paper);
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+        .np-head small { opacity: .8; letter-spacing: 1px; font-size: 10px; }
+
+        .np-item { padding: 8px 0; border-bottom: 1px dashed var(--ink-n); }
+        .np-item:last-child { border-bottom: 0; }
+        .np-item .top { display: flex; gap: 8px; align-items: baseline; }
+        .np-item .no  { flex: 0 0 auto; opacity: .5; font-size: 10px; }
+        .np-item .name {
+            flex: 1;
+            font-size: 15px;
+            color: var(--ink-n);
+            text-decoration: none;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+        .np-item a.name:hover { background: var(--yellow); }
+        .np-item .chip-n {
+            flex: 0 0 auto;
+            padding: 0 6px;
+            background: var(--yellow);
+            border: 1px solid var(--yellow-d);
+            font-size: 10px;
+            color: var(--ink);
+        }
+        .np-item .chip-n.pink { background: var(--pink); border-color: var(--pink-d); }
+        .np-item .sub { margin: 2px 0 0 22px; font-size: 11px; opacity: .8; word-break: break-word; }
+        .np-item .sub .dim { opacity: .65; }
+
+        .np-foot { text-align: center; margin-top: 8px; }
+        .np-foot .stamp {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 2px 12px;
+            border: 2px solid var(--pink-d);
+            color: var(--pink-d);
+            transform: rotate(-5deg);
+            letter-spacing: 3px;
+        }
+
+        /* newspaper states */
+        #news-stage.waiting .np-feed { display: none; }
+
+        #news-stage.printing .np-body { animation: npShake .12s steps(2) infinite; }
+        #news-stage.printing .np-led  { animation: npBlink .5s steps(2) infinite; }
+        #news-stage.printing .paper   { animation: npFeed 6s steps(60, end) forwards; }
+        #news-stage.skip .paper       { animation-duration: .05s; }
+
+        #news-stage.printed .paper { transform: none; }
+
+        @keyframes npFeed  { from { transform: translateY(-101%); } to { transform: translateY(0); } }
+        @keyframes npShake { 0% { transform: translateX(-1px); } 100% { transform: translateX(1px); } }
+        @keyframes npBlink { 50% { opacity: .2; } }
+
+        @media (max-width: 640px) {
+            .np-cols { grid-template-columns: 1fr; }
+            .np-col, .np-col:first-child, .np-col:last-child { padding: 0; border-right: 0; }
+            .np-col + .np-col { margin-top: 18px; padding-top: 14px; border-top: 3px double var(--ink-n); }
+            .masthead h2 { font-size: 26px; }
+        }
+
+        /* =========================================================
+           RECEIPT (bottom section, state classes live on #stage)
+           ========================================================= */
         .receipt-wrap { display: flex; flex-direction: column; align-items: center; margin: 24px 0; }
 
         .receipt {
@@ -41,7 +225,6 @@
         .receipt .head { letter-spacing: 1px; }
         .receipt #r-status { text-align: center; font-size: 12px; opacity: .7; margin: 10px 0; }
 
-        /* items */
         .receipt .item { margin: 12px 0; }
         .receipt .line1, .receipt .line2 { display: flex; gap: 8px; align-items: baseline; }
         .receipt .line1 .no  { flex: 0 0 auto; opacity: .55; }
@@ -64,7 +247,6 @@
         .receipt .line2 { padding-left: 26px; font-size: 12px; opacity: .7; }
         .receipt .line2 .dots { flex: 1; border-bottom: 1px dotted var(--text); transform: translateY(-4px); opacity: .6; }
 
-        /* totals */
         .receipt .row { display: flex; justify-content: space-between; margin: 3px 0; }
         .receipt .row.big { font-size: 18px; margin-top: 8px; }
         .receipt .row.big b { background: var(--yellow); padding: 0 6px; border: 1px solid var(--yellow-d); }
@@ -91,9 +273,7 @@
             letter-spacing: 3px;
         }
 
-        .receipt-tools { margin-top: 24px; }
-
-        /* ---------- Printer opening act ---------- */
+        /* receipt printer */
         .printer-box {
             position: relative;
             z-index: 2;
@@ -112,7 +292,7 @@
             border-radius: 14px 14px 8px 8px;
             box-shadow: 6px 6px 0 var(--shadow);
         }
-        .printer::before {                        /* paper tray on top */
+        .printer::before {
             content: "";
             position: absolute;
             left: 22%; right: 22%; top: -16px;
@@ -122,7 +302,7 @@
             border-bottom: 0;
             border-radius: 4px 4px 0 0;
         }
-        .printer .screen {                        /* little display */
+        .printer .screen {
             position: absolute;
             left: 14px; top: 18px;
             padding: 4px 10px;
@@ -143,19 +323,16 @@
             position: absolute;
             right: 18px; top: 50px;
             width: 40px; height: 10px;
-            background: repeating-linear-gradient(90deg,
-            var(--text) 0 8px, transparent 8px 16px);
+            background: repeating-linear-gradient(90deg, var(--text) 0 8px, transparent 8px 16px);
             opacity: .5;
         }
-        .printer .slot {                          /* the opening the paper comes out of */
+        .printer .slot {
             position: absolute;
             left: 6%; right: 6%; bottom: 14px;
             height: 12px;
             background: var(--text);
             border-radius: 6px;
         }
-
-        /* PRESS START button: centred in the printer */
         .printer .printer-start {
             position: absolute;
             left: 0; right: 0;
@@ -167,7 +344,6 @@
         }
         .printer .printer-start[hidden] { display: none; }
 
-        /* paper feed: clips the receipt so it appears from under the slot */
         .feed {
             width: 100%;
             max-width: 400px;
@@ -178,40 +354,76 @@
         }
         .feed .receipt { transform: translateY(-101%); }
 
-        .receipt-tools { opacity: 0; transition: opacity .6s .3s; }
+        /* receipt states */
+        #stage.waiting .feed { display: none; }
 
-        /* states */
-        .waiting .feed,
-        .waiting .receipt-tools { display: none; }
+        #stage.printing .printer { animation: shake .12s steps(2) infinite; }
+        #stage.printing .printer .led { animation: blink .5s steps(2) infinite; }
+        #stage.printing .feed .receipt { animation: feed 4s steps(40, end) forwards; }
+        #stage.skip .feed .receipt { animation-duration: .05s; }
 
-        .printing .printer { animation: shake .12s steps(2) infinite; }
-        .printing .printer .led { animation: blink .5s steps(2) infinite; }
-        .printing .feed .receipt { animation: feed 4s steps(40, end) forwards; }
-        .skip .feed .receipt { animation-duration: .05s; }
-
-        .printed .printer-box {
+        #stage.printed .printer-box {
             transform: translateY(-90px);
             opacity: 0;
             height: 0;
         }
-        .printed .receipt-tools { opacity: 1; }
-        .printed .feed .receipt { transform: none; }
+        #stage.printed .feed .receipt { transform: none; }
 
         @keyframes feed  { from { transform: translateY(-101%); } to { transform: translateY(0); } }
         @keyframes shake { 0% { transform: translateX(-1px); } 100% { transform: translateX(1px); } }
         @keyframes blink { 50% { opacity: .2; } }
 
-        @media (prefers-reduced-motion: reduce) {
-            .printer-box { display: none; }
-            .feed .receipt { transform: none; }
-            .receipt-tools { opacity: 1; }
+        /* =========================================================
+           SCROLL BUTTONS (back to top / scroll to bottom)
+           ========================================================= */
+        .scroll-btns {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .scroll-btns button {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            border: 0;
+            font: inherit;
+            font-size: 16px;
+            color: var(--ink);
+            background: var(--green);
+            cursor: pointer;
+            box-shadow: inset -4px -4px 0 var(--green-d), 4px 4px 0 var(--shadow);
+            transition: opacity .25s, visibility .25s;
+        }
+        .scroll-btns button:hover {
+            background: var(--yellow);
+            box-shadow: inset -4px -4px 0 var(--yellow-d), 4px 4px 0 var(--shadow);
+        }
+        .scroll-btns button:active {
+            transform: translate(3px, 3px);
+            box-shadow: inset -4px -4px 0 var(--yellow-d), 1px 1px 0 var(--shadow);
+        }
+        .scroll-btns button.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
         }
 
+        /* ---------- Reduced motion ---------- */
+        @media (prefers-reduced-motion: reduce) {
+            .np-printer, .printer-box { display: none; }
+            .paper, .feed .receipt { transform: none; }
+        }
+
+        /* ---------- Print ---------- */
         @media print {
-            nav.top, footer, main > h1, .receipt-tools { display: none; }
-            .receipt { box-shadow: none; }
-            .printer-box { display: none; }
-            .feed .receipt { transform: none; animation: none; }
+            nav.top, footer, main > h1, .scroll-btns { display: none; }
+            .receipt, .paper { box-shadow: none; }
+            .printer-box, .np-printer { display: none; }
+            .feed .receipt, .paper { transform: none; animation: none; }
         }
     </style>
 </head>
@@ -228,6 +440,60 @@
 </nav>
 
 <main>
+
+    <!-- ================= NEWSPAPER (on top) ================= -->
+    <h1>报刊采访</h1>
+
+    <div class="news-wrap" id="news-stage">
+
+        <div class="np-printer" id="np-printer">
+            <div class="np-body">
+                <div class="np-screen" id="np-screen">READY</div>
+                <div class="np-led"></div>
+                <div class="np-btns"></div>
+                <button class="btn np-start" id="np-start" type="button" hidden>PRESS START ▶</button>
+                <div class="np-slot"></div>
+            </div>
+        </div>
+
+        <div class="np-feed">
+            <div class="paper" id="paper">
+                <div class="masthead">
+                    <div class="flag">★ ★ ★ 钞组汇总 ★ ★ ★</div>
+                    <h2>松田里奈文字工作报告</h2>
+                    <div class="tag">MAGAZINES &amp; INTERVIEWS</div>
+                </div>
+
+                <hr class="np-rule">
+                <div class="np-meta">
+                    <span id="np-range">—</span>
+                    <span id="np-count">—</span>
+                </div>
+                <hr class="np-rule thin">
+
+                <p id="np-status">LOADING NEWSPAPER...</p>
+
+                <div class="np-cols">
+                    <section class="np-col">
+                        <div class="np-head"><span>報刊 MAGAZINES</span><small id="np-mag-n">0</small></div>
+                        <div id="np-mags"></div>
+                    </section>
+                    <section class="np-col">
+                        <div class="np-head"><span>采訪 INTERVIEWS</span><small id="np-int-n">0</small></div>
+                        <div id="np-ints"></div>
+                    </section>
+                </div>
+
+                <hr class="np-rule">
+                <div class="np-foot">
+                    <div>谢谢阅读 ♥</div>
+                    <div class="stamp">PRINTED</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= RECEIPT (below) ================= -->
     <h1>博客收据</h1>
 
     <div class="receipt-wrap" id="stage">
@@ -246,7 +512,7 @@
             <div class="receipt">
                 <div class="center">
                     <div class="logo">🌸</div>
-                    <h2 class="shop">BLOG STORE</h2>
+                    <h2 class="shop">个人博客记录</h2>
                     <p class="sub">sakurazaka46.com / diary</p>
                 </div>
 
@@ -260,29 +526,31 @@
                 <div class="head"><span>NO. TITLE</span><span>PHOTOS</span></div>
                 <hr class="rule solid">
 
-                <p id="r-status">LOADING RECEIPT...</p>
+                <p id="r-status">收据加载中</p>
                 <div id="r-items"></div>
 
                 <hr class="rule solid">
-                <div class="row"><span>POSTS</span><span id="t-posts">0</span></div>
-                <div class="row"><span>AVG PHOTOS / POST</span><span id="t-avg">0</span></div>
-                <div class="row big"><span>TOTAL PHOTOS</span><b id="t-photos">0</b></div>
+                <div class="row"><span>总共发了</span><span id="t-posts">0</span></div>
+                <div class="row"><span>每博客平均含图量</span><span id="t-avg">0</span></div>
+                <div class="row big"><span>总含图</span><b id="t-photos">0</b></div>
                 <hr class="rule">
 
                 <div class="center">
-                    <p class="thanks">THANK YOU ♥ SEE YOU NEXT POST</p>
+                    <p class="thanks">一直以来都谢谢你了 ♥ 下个博客见</p>
                     <div class="stamp">PAID</div>
                     <div class="barcode"></div>
                     <div class="code" id="r-code">0000000000</div>
                 </div>
             </div>
         </div>
-
-        <div class="receipt-tools">
-            <button class="btn" onclick="window.print()">PRINT ▶</button>
-        </div>
     </div>
 </main>
+
+<!-- ================= SCROLL BUTTONS ================= -->
+<div class="scroll-btns">
+    <button type="button" id="to-top" aria-label="Back to top" title="Back to top">▲</button>
+    <button type="button" id="to-bottom" aria-label="Scroll to bottom" title="Scroll to bottom">▼</button>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -290,120 +558,255 @@
     (() => {
         const XLSX_FILE = "workdata.xlsx";
 
-// Sheet tab to read. Leave "" to auto-detect the sheet that has a 博客标题 column.
-        const SHEET = "";
-
-// Header keywords (partial match). Fallback = column position (A = 0).
-        const COLS = {
-            no:    { key: "序号",     pos: 0 },
-            date:  { key: "日期",     pos: 1 },
-            blog:  { key: "博客序号", pos: 2 },
-            time:  { key: "发布时间", pos: 3 },
-            title: { key: "博客标题", pos: 4 },
-            count: { key: "图片数",   pos: 5 },
-            url:   { key: "官网链接", pos: 6 }
-        };
-
         const $ = id => document.getElementById(id);
         const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
             ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-        const fmtDate = d => {
-            const s = String(d).replace(/\D/g, "");
-            return s.length >= 8 ? `${s.slice(0, 4)}.${s.slice(4, 6)}.${s.slice(6, 8)}` : String(d);
-        };
-
-        /* ---------- Printer opening act ---------- */
-        let started = false, clicked = false, loaded = false;
-
         const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-        if (reduced) {
-            clicked = true;                         // no printer, no button, no animation
-        } else {
-            document.body.classList.add("waiting"); // printer visible, paper hidden
-            $("start-btn").hidden = false;
-        }
 
-        $("start-btn").addEventListener("click", e => {
-            e.stopPropagation();                    // don't trigger the stage's click-to-skip
-            clicked = true;
-            $("start-btn").hidden = true;
-            $("p-screen").textContent = "WARMING UP...";
-            document.body.classList.remove("waiting");
-            tryStart();
-        });
+        /* =========================================================
+           NEWSPAPER
+           ========================================================= */
+        const news = (() => {
+            // Sheet names (leave "" to auto-detect by name, then by header)
+            const MAG_SHEET = "";
+            const INT_SHEET = "";
+            const MAG_NAME_RE = /报刊|報刊/;
+            const INT_NAME_RE = /采访|采訪|採访|採訪/;
 
-        function tryStart() {
-            if (clicked && loaded) startPrint();
-        }
+            const MAG_COLS = {
+                no:      { key: "序号",     pos: 0 },
+                date:    { key: "日期",     pos: 1 },
+                name:    { key: "杂志名",   pos: 2 },
+                issue:   { key: "期数",     pos: 3 },
+                members: { key: "合作成员", pos: 4 },
+                note:    { key: "备注",     pos: 5 }
+            };
+            const INT_COLS = {
+                no:      { key: "序号",     pos: 0 },
+                date:    { key: "日期",     pos: 1 },
+                media:   { key: "媒体",     pos: 2 },
+                title:   { key: "标题",     pos: 3 },
+                members: { key: "合作成员", pos: 4 },
+                url:     { key: "原文链接", pos: 5 }
+            };
 
-        function startPrint() {
-            if (started) return;
-            started = true;
+            const stage = $("news-stage");
+            let started = false, clicked = false, loaded = false;
 
-            const body = document.body;
-            const printer = $("printer");
-            const receipt = document.querySelector(".receipt");
-            $("p-screen").textContent = "PRINTING...";
-            body.classList.add("printing");
+            const fmtDate = d => {
+                const s = String(d).trim();
+                const digits = s.replace(/\D/g, "");
+                return /^\d{8}$/.test(digits) ? `${digits.slice(0, 4)}.${digits.slice(4, 6)}.${digits.slice(6, 8)}` : s;
+            };
 
-            // click anywhere on the stage to skip
-            $("stage").addEventListener("click", () => body.classList.add("skip"), { once: true });
-
-            receipt.addEventListener("animationend", () => {
-                $("p-screen").textContent = "DONE ♥";
-                setTimeout(() => {
-                    body.classList.remove("printing");
-                    body.classList.add("printed");              // printer floats up and fades
-                    setTimeout(() => printer.remove(), 1300);   // clean up after the fade
-                }, 400);
-            }, { once: true });
-        }
-
-        function readWorkbook(buf) {
-            const wb = XLSX.read(buf, { type: "array" });
-            const toRows = n => XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: false, defval: "" });
-
-            let name = SHEET;
-            if (!name) {
-                name = wb.SheetNames.find(n => (toRows(n)[0] || []).some(h => String(h).includes(COLS.title.key)));
+            if (reduced) {
+                clicked = true;
+                stage.classList.add("printed");
+            } else {
+                stage.classList.add("waiting");
+                $("np-start").hidden = false;
             }
-            if (!name || !wb.Sheets[name]) throw new Error("No sheet with a 博客标题 column. Set SHEET in the script.");
 
-            const rows = toRows(name);
-            const headers = (rows[0] || []).map(h => String(h).trim());
-            const idx = {};
-            for (const k in COLS) {
-                const i = headers.findIndex(h => h.includes(COLS[k].key));
-                idx[k] = i !== -1 ? i : COLS[k].pos;
+            $("np-start").addEventListener("click", e => {
+                e.stopPropagation();
+                clicked = true;
+                $("np-start").hidden = true;
+                $("np-screen").textContent = "WARMING UP...";
+                stage.classList.remove("waiting");
+                tryStart();
+            });
+
+            function tryStart() { if (clicked && loaded) startPrint(); }
+
+            function startPrint() {
+                if (started) return;
+                started = true;
+                if (stage.classList.contains("printed")) return;   // reduced motion
+
+                $("np-screen").textContent = "PRINTING...";
+                stage.classList.add("printing");
+
+                stage.addEventListener("click", () => stage.classList.add("skip"), { once: true });
+
+                $("paper").addEventListener("animationend", () => {
+                    $("np-screen").textContent = "DONE ♥";
+                    stage.classList.remove("printing");
+                    stage.classList.add("printed");
+                }, { once: true });
             }
-            const get = (r, k) => String(r[idx[k]] ?? "").trim();
 
-            const items = rows.slice(1)
-                .filter(r => get(r, "title") !== "")
-                .map((r, i) => ({
-                    n:     get(r, "no") || String(i + 1),
-                    date:  get(r, "date"),
-                    blog:  get(r, "blog"),
-                    time:  get(r, "time"),
-                    title: get(r, "title"),
-                    count: parseInt(get(r, "count"), 10) || 0,
-                    url:   get(r, "url")
-                }));
+            function pickSheet(wb, fixed, nameRe, headerKey) {
+                if (fixed && wb.Sheets[fixed]) return fixed;
+                const byName = wb.SheetNames.find(n => nameRe.test(n));
+                if (byName) return byName;
+                return wb.SheetNames.find(n => {
+                    const head = XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: false, defval: "" })[0] || [];
+                    return head.some(h => String(h).includes(headerKey));
+                });
+            }
 
-            if (!items.length) throw new Error("Sheet '" + name + "' has no rows.");
-            render(items);
-        }
+            function readSheet(wb, name, COLS, mustKey) {
+                const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, raw: false, defval: "" });
+                const headers = (rows[0] || []).map(h => String(h).trim());
+                const idx = {};
+                for (const k in COLS) {
+                    const i = headers.findIndex(h => h.includes(COLS[k].key));
+                    idx[k] = i !== -1 ? i : COLS[k].pos;
+                }
+                const get = (r, k) => String(r[idx[k]] ?? "").trim();
+                return rows.slice(1)
+                    .filter(r => get(r, mustKey) !== "")
+                    .map((r, i) => {
+                        const o = {};
+                        for (const k in COLS) o[k] = get(r, k);
+                        o.no = o.no || String(i + 1);
+                        return o;
+                    });
+            }
 
-        function render(items) {
-            let photos = 0;
-            $("r-items").innerHTML = items.map((it, i) => {
-                photos += it.count;
-                const num  = String(i + 1).padStart(2, "0");
-                const safe = /^https?:\/\//i.test(it.url) ? it.url : "";
-                const title = safe
-                    ? `<a class="ttl" href="${esc(safe)}" target="_blank" rel="noopener">${esc(it.title)}</a>`
-                    : `<span class="ttl">${esc(it.title)}</span>`;
-                return `
+            const members = m => m ? `<div class="sub">▸ ${esc(m)}</div>` : "";
+
+            function render(mags, ints, warn) {
+                $("np-mags").innerHTML = mags.length ? mags.map((it, i) => `
+                <div class="np-item">
+                    <div class="top">
+                        <span class="no">${String(i + 1).padStart(2, "0")}</span>
+                        <span class="name">${esc(it.name)}</span>
+                        ${it.issue ? `<span class="chip-n">${esc(it.issue)}</span>` : ""}
+                    </div>
+                    <div class="sub"><span class="dim">${esc(fmtDate(it.date))}</span></div>
+                    ${members(it.members)}
+                    ${it.note ? `<div class="sub dim">※ ${esc(it.note)}</div>` : ""}
+                </div>`).join("") : `<div class="np-item sub">NO NEWS</div>`;
+
+                $("np-ints").innerHTML = ints.length ? ints.map((it, i) => {
+                    const safe = /^https?:\/\//i.test(it.url) ? it.url : "";
+                    const title = safe
+                        ? `<a class="name" href="${esc(safe)}" target="_blank" rel="noopener">${esc(it.title)}</a>`
+                        : `<span class="name">${esc(it.title)}</span>`;
+                    return `
+                <div class="np-item">
+                    <div class="top">
+                        <span class="no">${String(i + 1).padStart(2, "0")}</span>
+                        ${title}
+                        ${it.media ? `<span class="chip-n pink">${esc(it.media)}</span>` : ""}
+                    </div>
+                    <div class="sub"><span class="dim">${esc(fmtDate(it.date))}</span></div>
+                    ${members(it.members)}
+                </div>`;
+                }).join("") : `<div class="np-item sub">NO NEWS</div>`;
+
+                $("np-mag-n").textContent = `${mags.length} ITEMS`;
+                $("np-int-n").textContent = `${ints.length} ITEMS`;
+
+                const dates = [...mags, ...ints].map(x => fmtDate(x.date)).filter(Boolean).sort();
+                $("np-range").textContent = dates.length ? `${dates[0]} – ${dates[dates.length - 1]}` : "—";
+                $("np-count").textContent = `${mags.length + ints.length} STORIES`;
+
+                $("np-status").textContent = warn.join(" · ");
+                $("np-status").style.display = warn.length ? "block" : "none";
+
+                loaded = true;
+                tryStart();
+            }
+
+            function fromWorkbook(wb) {
+                const warn = [];
+                const magName = pickSheet(wb, MAG_SHEET, MAG_NAME_RE, "杂志名");
+                const intName = pickSheet(wb, INT_SHEET, INT_NAME_RE, "媒体");
+
+                let mags = [], ints = [];
+                if (magName) mags = readSheet(wb, magName, MAG_COLS, "name"); else warn.push("SHEET NOT FOUND: 報刊");
+                if (intName) ints = readSheet(wb, intName, INT_COLS, "title"); else warn.push("SHEET NOT FOUND: 采訪");
+
+                if (!mags.length && !ints.length) throw new Error("No rows found in 報刊 / 采訪 sheets.");
+                render(mags, ints, warn);
+            }
+
+            function fail(err) {
+                $("np-status").style.display = "block";
+                $("np-status").textContent = "ERROR: " + err.message;
+                loaded = true;
+                tryStart();
+            }
+
+            return { fromWorkbook, fail };
+        })();
+
+        /* =========================================================
+           RECEIPT
+           ========================================================= */
+        const receipt = (() => {
+            // Sheet tab to read. Leave "" to auto-detect the sheet that has a 博客标题 column.
+            const SHEET = "";
+
+            const COLS = {
+                no:    { key: "序号",     pos: 0 },
+                date:  { key: "日期",     pos: 1 },
+                blog:  { key: "博客序号", pos: 2 },
+                time:  { key: "发布时间", pos: 3 },
+                title: { key: "博客标题", pos: 4 },
+                count: { key: "图片数",   pos: 5 },
+                url:   { key: "官网链接", pos: 6 }
+            };
+
+            const stage = $("stage");
+            let started = false, clicked = false, loaded = false;
+
+            const fmtDate = d => {
+                const s = String(d).replace(/\D/g, "");
+                return s.length >= 8 ? `${s.slice(0, 4)}.${s.slice(4, 6)}.${s.slice(6, 8)}` : String(d);
+            };
+
+            if (reduced) {
+                clicked = true;
+            } else {
+                stage.classList.add("waiting");
+                $("start-btn").hidden = false;
+            }
+
+            $("start-btn").addEventListener("click", e => {
+                e.stopPropagation();
+                clicked = true;
+                $("start-btn").hidden = true;
+                $("p-screen").textContent = "WARMING UP...";
+                stage.classList.remove("waiting");
+                tryStart();
+            });
+
+            function tryStart() { if (clicked && loaded) startPrint(); }
+
+            function startPrint() {
+                if (started) return;
+                started = true;
+
+                const printer = $("printer");
+                const rcpt = document.querySelector(".receipt");
+                $("p-screen").textContent = "PRINTING...";
+                stage.classList.add("printing");
+
+                stage.addEventListener("click", () => stage.classList.add("skip"), { once: true });
+
+                rcpt.addEventListener("animationend", () => {
+                    $("p-screen").textContent = "DONE ♥";
+                    setTimeout(() => {
+                        stage.classList.remove("printing");
+                        stage.classList.add("printed");
+                        setTimeout(() => printer.remove(), 1300);
+                    }, 400);
+                }, { once: true });
+            }
+
+            function render(items) {
+                let photos = 0;
+                $("r-items").innerHTML = items.map((it, i) => {
+                    photos += it.count;
+                    const num  = String(i + 1).padStart(2, "0");
+                    const safe = /^https?:\/\//i.test(it.url) ? it.url : "";
+                    const title = safe
+                        ? `<a class="ttl" href="${esc(safe)}" target="_blank" rel="noopener">${esc(it.title)}</a>`
+                        : `<span class="ttl">${esc(it.title)}</span>`;
+                    return `
     <div class="item">
       <div class="line1">
         <span class="no">${num}</span>
@@ -416,31 +819,107 @@
         <span>${esc(it.time)}${it.time ? " JST" : ""}</span>
       </div>
     </div>`;
-            }).join("");
+                }).join("");
 
-            const first = items[0], last = items[items.length - 1];
-            $("r-status").style.display = "none";
-            $("r-range").textContent = `${fmtDate(first.date)} – ${fmtDate(last.date)}`;
-            $("r-count").textContent = `${items.length} ITEMS`;
-            $("t-posts").textContent = items.length;
-            $("t-photos").textContent = photos;
-            $("t-avg").textContent = (photos / items.length).toFixed(1);
-            $("r-code").textContent =
-                first.blog.replace(/\D/g, "") + last.blog.replace(/\D/g, "") + String(photos).padStart(4, "0");
+                const first = items[0], last = items[items.length - 1];
+                $("r-status").style.display = "none";
+                $("r-range").textContent = `${fmtDate(first.date)} – ${fmtDate(last.date)}`;
+                $("r-count").textContent = `${items.length} ITEMS`;
+                $("t-posts").textContent = items.length;
+                $("t-photos").textContent = photos;
+                $("t-avg").textContent = (photos / items.length).toFixed(1);
+                $("r-code").textContent =
+                    first.blog.replace(/\D/g, "") + last.blog.replace(/\D/g, "") + String(photos).padStart(4, "0");
 
-            loaded = true;
-            tryStart();
-        }
+                loaded = true;
+                tryStart();
+            }
 
-        fetch(XLSX_FILE)
-            .then(r => { if (!r.ok) throw new Error("HTTP " + r.status + " for " + XLSX_FILE); return r.arrayBuffer(); })
-            .then(readWorkbook)
-            .catch(err => {
-                console.error(err);
+            function fromWorkbook(wb) {
+                const toRows = n => XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: false, defval: "" });
+
+                let name = SHEET;
+                if (!name) {
+                    name = wb.SheetNames.find(n => (toRows(n)[0] || []).some(h => String(h).includes(COLS.title.key)));
+                }
+                if (!name || !wb.Sheets[name]) throw new Error("No sheet with a 博客标题 column. Set SHEET in the script.");
+
+                const rows = toRows(name);
+                const headers = (rows[0] || []).map(h => String(h).trim());
+                const idx = {};
+                for (const k in COLS) {
+                    const i = headers.findIndex(h => h.includes(COLS[k].key));
+                    idx[k] = i !== -1 ? i : COLS[k].pos;
+                }
+                const get = (r, k) => String(r[idx[k]] ?? "").trim();
+
+                const items = rows.slice(1)
+                    .filter(r => get(r, "title") !== "")
+                    .map((r, i) => ({
+                        n:     get(r, "no") || String(i + 1),
+                        date:  get(r, "date"),
+                        blog:  get(r, "blog"),
+                        time:  get(r, "time"),
+                        title: get(r, "title"),
+                        count: parseInt(get(r, "count"), 10) || 0,
+                        url:   get(r, "url")
+                    }));
+
+                if (!items.length) throw new Error("Sheet '" + name + "' has no rows.");
+                render(items);
+            }
+
+            function fail(err) {
                 $("r-status").textContent = "ERROR: " + err.message;
                 loaded = true;
                 tryStart();
+            }
+
+            return { fromWorkbook, fail };
+        })();
+
+        /* =========================================================
+           ONE FETCH, BOTH SECTIONS
+           ========================================================= */
+        fetch(XLSX_FILE)
+            .then(r => { if (!r.ok) throw new Error("HTTP " + r.status + " for " + XLSX_FILE); return r.arrayBuffer(); })
+            .then(buf => {
+                const wb = XLSX.read(buf, { type: "array" });
+                try { news.fromWorkbook(wb); }    catch (e) { console.error(e); news.fail(e); }
+                try { receipt.fromWorkbook(wb); } catch (e) { console.error(e); receipt.fail(e); }
+            })
+            .catch(err => {
+                console.error(err);
+                news.fail(err);
+                receipt.fail(err);
             });
+
+        /* =========================================================
+           SCROLL BUTTONS
+           ========================================================= */
+        (() => {
+            const up = $("to-top"), down = $("to-bottom");
+            const behavior = reduced ? "auto" : "smooth";
+
+            const maxY = () => document.documentElement.scrollHeight - innerHeight;
+
+            function update() {
+                const y = scrollY;
+                up.classList.toggle("hide", y < 120);            // already near the top
+                down.classList.toggle("hide", y > maxY() - 120); // already near the bottom
+            }
+
+            up.addEventListener("click",   () => scrollTo({ top: 0, behavior }));
+            down.addEventListener("click", () => scrollTo({ top: maxY(), behavior }));
+
+            addEventListener("scroll", update, { passive: true });
+            addEventListener("resize", update);
+
+            // page height changes while the printers run, so keep checking
+            new ResizeObserver(update).observe(document.body);
+            update();
+        })();
+
     })();
 </script>
 </body>
